@@ -41,13 +41,15 @@ class ProxyFix:
         Values to X-Forwarded-For are expected to be appended so the inner proxy layers are to the
         right. The innermost untrusted IP is returned.
         """
-        for ip_str in reversed([remote] + forwarded_for):
+        previous = None
+        for ip_str in reversed(forwarded_for + [remote]):
             ip_str = ip_str.strip()
             try:
-                if not ip_address(ip_str) in self.trusted:
+                if ip_address(ip_str) not in self.trusted:
                     return ip_str
             except ValueError:
-                return ip_str
+                return previous
+            previous = ip_str
         return remote
 
     def update_environ(self, environ):

@@ -3,6 +3,8 @@
 from copy import copy
 from unittest import mock
 
+import pytest
+
 from impact_stack import proxyfix
 
 
@@ -41,20 +43,6 @@ class ProxyFixTest:
         fix.wrap(app)(env, mock.Mock())
         assert app.mock_calls == [mock.call(expected_env, mock.ANY)]
 
-    def test_multiple_trusted_multiple_untrusted(self):
-        """Test getting the remote IP for multiple proxy layers."""
-        fix = proxyfix.ProxyFix.from_config(create_config_getter(["127.0.0.1", "10.0.0.1"]))
-        remote_address = fix.get_remote_addr(
-            ["8.8.8.8", "10.0.0.1", "127.0.0.1"],
-            "1.1.1.1",
-        )
-        assert remote_address == "8.8.8.8"
-
-    def test_all_trusted(self):
-        """Test getting the remote IP with only trusted IPs."""
-        fix = proxyfix.ProxyFix.from_config(create_config_getter(["127.0.0.1"]))
-        assert fix.get_remote_addr([], "127.0.0.1") == "127.0.0.1"
-
     def test_no_trusted_layer(self):
         """Test request from an untrusted remote."""
         fix = proxyfix.ProxyFix.from_config(create_config_getter(["127.0.0.1"]))
@@ -92,3 +80,18 @@ class ProxyFixTest:
         expected_env = copy_env(env)
         fix.update_environ(env)
         assert env == expected_env
+
+    @pytest.mark.parametrize(
+        "forwarded_for,remote,expected",
+        [
+            ([], "8.8.8.8", "8.8.8.8"),
+            ([], "127.0.0.1", "127.0.0.1"),
+            (["127.0.0.1"], "8.8.8.8", "8.8.8.8"),
+            (["8.8.8.8", "10.0.0.1", "127.0.0.1"], "1.1.1.1", "1.1.1.1"),
+            (["no-ip"], "127.0.0.1", "127.0.0.1"),
+        ],
+    )
+    def test_get_remote_addr(self, forwarded_for, remote, expected):
+        """Test getting the innermost non-trusted IP address."""
+        fix = proxyfix.ProxyFix.from_config(create_config_getter(["127.0.0.1", "10.0.0.1"]))
+        assert fix.get_remote_addr(forwarded_for, remote) == expected
