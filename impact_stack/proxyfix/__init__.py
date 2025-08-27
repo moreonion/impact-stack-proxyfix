@@ -1,9 +1,7 @@
 """WSGI ProxyFix middleware."""
 
-import typing
+import typing as t
 from ipaddress import ip_address
-
-import flask
 
 
 def _split(string):
@@ -25,13 +23,16 @@ class ProxyFix:
     `werkzeug.proxy_fix.orig_http_host`.
 
     Args:
-        app: The Flask application to wrap.
+        proxies: List of IP-addreses which’s X-Forwarded headers should be trusted.
     """
 
-    def __init__(self, app: flask.Flask):
-        """Wrap a Flask app and read variables from its config."""
-        self.wsgi = app.wsgi_app
-        proxies = app.config.get("PROXYFIX_TRUSTED", ["127.0.0.1"])
+    @classmethod
+    def from_config(cls, config_getter: t.Callable[[str, t.Any], t.Any]):
+        """Create a new instance from a config getter function."""
+        return cls(config_getter("PROXYFIX_TRUSTED", ["127.0.0.1"]))
+
+    def __init__(self, proxies: t.Iterable[str]):
+        """Create a new instance by passing the list of trusted proxies."""
         self.trusted = frozenset(ip_address(p.strip()) for p in proxies)
 
     def get_remote_addr(self, forwarded_for, remote):
@@ -83,7 +84,11 @@ class ProxyFix:
         if remote_addr is not None:
             environ["REMOTE_ADDR"] = remote_addr
 
-    def __call__(self, environ, start_response):
-        """Change the WSGI environment and call the wrapped app."""
-        self.update_environ(environ)
-        return self.wsgi(environ, start_response)
+    def wrap(self, wsgi_app):
+        """Wrap a wsgi app with this middleware."""
+
+        def wrapped(environ, start_response):
+            self.update_environ(environ)
+            return wsgi_app(environ, start_response)
+
+        return wrapped

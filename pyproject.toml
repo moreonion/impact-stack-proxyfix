@@ -2,7 +2,6 @@
 name = "impact-stack-proxyfix"
 dynamic = ["version"]
 dependencies = [
-  "flask",
 ]
 
 [project.optional-dependencies]
