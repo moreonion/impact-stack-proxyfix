@@ -64,9 +64,6 @@ class ProxyFix:
         except ValueError:
             remote_addr_ip = ip_address("127.0.0.1")
 
-        forwarded_proto = env("HTTP_X_FORWARDED_PROTO", "")
-        forwarded_for = _split(env("HTTP_X_FORWARDED_FOR", ""))
-        forwarded_host = env("HTTP_X_FORWARDED_HOST", "")
         environ.update(
             {
                 "werkzeug.proxy_fix.orig_wsgi_url_scheme": env("wsgi.url_scheme"),
@@ -76,11 +73,12 @@ class ProxyFix:
         )
 
         if remote_addr_ip in self.trusted:
-            if forwarded_host:
+            if forwarded_host := env("HTTP_X_FORWARDED_HOST", ""):
                 environ["HTTP_HOST"] = forwarded_host
-            if forwarded_proto:
+            if forwarded_proto := env("HTTP_X_FORWARDED_PROTO", ""):
                 https = "https" in forwarded_proto.lower()
                 environ["wsgi.url_scheme"] = "https" if https else "http"
+            forwarded_for = _split(env("HTTP_X_FORWARDED_FOR", ""))
             if remote_addr := self.get_remote_addr(forwarded_for):
                 environ["REMOTE_ADDR"] = remote_addr
 
