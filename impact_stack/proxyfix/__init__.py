@@ -35,14 +35,14 @@ class ProxyFix:
         """Create a new instance by passing the list of trusted proxies."""
         self.trusted = frozenset(ip_address(p.strip()) for p in proxies)
 
-    def get_remote_addr(self, forwarded_for, remote):
+    def get_remote_addr(self, forwarded_for: list[str]):
         """Select the first “untrusted” remote addr.
 
         Values to X-Forwarded-For are expected to be appended so the inner proxy layers are to the
         right. The innermost untrusted IP is returned.
         """
         previous = None
-        for ip_str in reversed(forwarded_for + [remote]):
+        for ip_str in reversed(forwarded_for):
             ip_str = ip_str.strip()
             try:
                 if ip_address(ip_str) not in self.trusted:
@@ -50,7 +50,7 @@ class ProxyFix:
             except ValueError:
                 return previous
             previous = ip_str
-        return remote
+        return previous
 
     def update_environ(self, environ):
         """Update the WSGI environment according to the headers."""
@@ -81,10 +81,8 @@ class ProxyFix:
             if forwarded_proto:
                 https = "https" in forwarded_proto.lower()
                 environ["wsgi.url_scheme"] = "https" if https else "http"
-
-        remote_addr = self.get_remote_addr(forwarded_for, remote_addr)
-        if remote_addr is not None:
-            environ["REMOTE_ADDR"] = remote_addr
+            if remote_addr := self.get_remote_addr(forwarded_for):
+                environ["REMOTE_ADDR"] = remote_addr
 
     def wrap(self, wsgi_app):
         """Wrap a wsgi app with this middleware."""

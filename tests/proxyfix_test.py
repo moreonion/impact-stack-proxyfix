@@ -82,16 +82,16 @@ class ProxyFixTest:
         assert env == expected_env
 
     @pytest.mark.parametrize(
-        "forwarded_for,remote,expected",
+        "forwarded_for,expected",
         [
-            ([], "8.8.8.8", "8.8.8.8"),
-            ([], "127.0.0.1", "127.0.0.1"),
-            (["127.0.0.1"], "8.8.8.8", "8.8.8.8"),
-            (["8.8.8.8", "10.0.0.1", "127.0.0.1"], "1.1.1.1", "1.1.1.1"),
-            (["no-ip"], "127.0.0.1", "127.0.0.1"),
+            (["8.8.8.8"], "8.8.8.8"),
+            (["127.0.0.1"], "127.0.0.1"),
+            (["127.0.0.1", "8.8.8.8"], "8.8.8.8"),
+            (["8.8.8.8", "10.0.0.1", "127.0.0.1", "1.1.1.1"], "1.1.1.1"),
+            (["no-ip", "127.0.0.1"], "127.0.0.1"),
         ],
     )
-    def test_get_remote_addr(self, forwarded_for, remote, expected):
+    def test_get_remote_addr(self, forwarded_for, expected):
         """Test getting the innermost non-trusted IP address."""
         fix = proxyfix.ProxyFix.from_config(create_config_getter(["127.0.0.1", "10.0.0.1"]))
-        assert fix.get_remote_addr(forwarded_for, remote) == expected
+        assert fix.get_remote_addr(forwarded_for) == expected
