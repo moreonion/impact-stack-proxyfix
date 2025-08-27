@@ -12,6 +12,7 @@ dev = [
   "pylint",
   "pytest",
   "pytest-cov",
+  "twine",
 ]
 
 [build-system]
