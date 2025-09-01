@@ -1,1 +1,1 @@
-"""Tests for the boilerplate_project."""
+"""Tests for the impact-stack-rest library."""
