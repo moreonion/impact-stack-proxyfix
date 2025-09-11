@@ -12,7 +12,7 @@ black==25.1.0
     # via impact-stack-proxyfix (pyproject.toml)
 certifi==2025.8.3
     # via requests
-cffi==1.17.1
+cffi==2.0.0
     # via cryptography
 cfgv==3.4.0
     # via pre-commit
@@ -20,21 +20,21 @@ charset-normalizer==3.4.3
     # via requests
 click==8.2.1
     # via black
-coverage[toml]==7.9.2
+coverage[toml]==7.10.6
     # via pytest-cov
-cryptography==45.0.6
+cryptography==45.0.7
     # via secretstorage
 dill==0.4.0
     # via pylint
-distlib==0.3.9
+distlib==0.4.0
     # via virtualenv
 docutils==0.22
     # via readme-renderer
-filelock==3.18.0
+filelock==3.19.1
     # via virtualenv
 id==1.5.0
     # via twine
-identify==2.6.12
+identify==2.6.14
     # via pre-commit
 idna==3.10
     # via requests
@@ -64,7 +64,7 @@ mccabe==0.7.0
     # via pylint
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.7.0
+more-itertools==10.8.0
     # via
     #   jaraco-classes
     #   jaraco-functools
@@ -81,7 +81,7 @@ packaging==25.0
     #   twine
 pathspec==0.12.1
     # via black
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   black
     #   pylint
@@ -90,22 +90,22 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pre-commit==4.2.0
+pre-commit==4.3.0
     # via impact-stack-proxyfix (pyproject.toml)
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pygments==2.19.2
     # via
     #   pytest
     #   readme-renderer
     #   rich
-pylint==3.3.7
+pylint==3.3.8
     # via impact-stack-proxyfix (pyproject.toml)
-pytest==8.4.1
+pytest==8.4.2
     # via
     #   impact-stack-proxyfix (pyproject.toml)
     #   pytest-cov
-pytest-cov==6.2.1
+pytest-cov==7.0.0
     # via impact-stack-proxyfix (pyproject.toml)
 pyyaml==6.0.2
     # via pre-commit
@@ -122,17 +122,17 @@ rfc3986==2.0.0
     # via twine
 rich==14.1.0
     # via twine
-secretstorage==3.3.3
+secretstorage==3.4.0
     # via keyring
 tomlkit==0.13.3
     # via pylint
-twine==6.1.0
+twine==6.2.0
     # via impact-stack-proxyfix (pyproject.toml)
 urllib3==2.5.0
     # via
     #   requests
     #   twine
-virtualenv==20.31.2
+virtualenv==20.34.0
     # via pre-commit
 zipp==3.23.0
     # via importlib-metadata
